@@ -11,7 +11,8 @@ Usage
 -----
 Assume NG works using the @Assumption annotation and the AssumptionListener.
 
-The <code>@Assumption</code> annotation is defined on a <code>@Test</code> method, and calls out to an assumption method which decides whether or not the <code>@Test</code> annotated method needs to run in the current context.
+The <code>@Assumption</code> annotation is defined on a <code>@Test</code> method, and calls out to one or more assumption methods which decide whether or not the <code>@Test</code> annotated method needs to run in the current context. Only if all of the assumption methods pass, the <code>@Test</code> method will actually be invoked, otherwise it will be marked as
+<code>skipped</code>.
 
 The <code>AssumptionListener</code> scans for <code>@Assumption</code> annotations and handles the actual invocation of the assumption method.
 
@@ -24,7 +25,7 @@ A full example could be:
 	@Listeners(AssumptionListener.class)
     public class WeatherTest {
         @Test
-        @Assumption(method = "assumeWeatherIsNice")
+        @Assumption(methods = "assumeWeatherIsNice")
         public void shouldNotRunWhenItsRaining() {
             // Do some stuff, like going to the beach...
         }

@@ -1,0 +1,20 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+
+version = "1.0.0-SNAPSHOT"
+group = "nl.javadude.assumeng"
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compile 'org.testng:testng:6.4'
+  testCompile 'org.hamcrest:hamcrest-core:1.2.1'
+  testCompile 'org.hamcrest:hamcrest-library:1.2.1'
+}
+
+test {
+  useTestNG()
+}
+

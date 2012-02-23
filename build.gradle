@@ -1,5 +1,6 @@
 apply plugin: 'java'
 apply plugin: 'idea'
+apply plugin: 'signing'
 
 version = "1.0.0-SNAPSHOT"
 group = "nl.javadude.assumeng"
@@ -18,3 +19,69 @@ test {
   useTestNG()
 }
 
+task sourcesJar(type: Jar) {
+	from sourceSets.main.allSource
+	classifier = 'sources'
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	classifier = 'javadoc'
+	from javadoc.destinationDir
+}
+
+artifacts {
+	archives sourcesJar, javadocJar
+}
+
+signing {
+	sign configurations.archives
+}
+
+uploadArchives {
+	if(project.hasProperty('sonatypeUsername')) {
+		repositories.mavenDeployer {
+			beforeDeployment { MavenDeployment deployment -> signPom(deployment) }
+
+			configuration = configurations.archives
+
+			repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
+				authentication(userName: sonatypeUsername, password: sonatypePassword)
+			}
+			snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
+				authentication(userName: sonatypeUsername, password: sonatypePassword)
+			}
+
+			pom.project {
+				name 'Assumg NG'
+				description 'Assumg NG -- Assumptions for TestNG'
+				packaging 'jar'
+				url 'https://github.com/hierynomus/assumeng'
+				inceptionYear '2012'
+
+				scm {
+					url 'https://github.com/hierynomus/assumeng'
+				}
+
+				licenses {
+					license {
+						name 'The Apache Software License, Version 2.0'
+						url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+						distribution 'repo'
+					}
+				}
+
+				developers {
+					developer {
+						id 'hierynomus'
+						name 'Jeroen van Erp'
+						url 'http://www.javadude.nl/'
+						email 'jeroen@javadude.nl'
+						roles {
+							role 'Developer'
+						}
+					}
+				}
+			}
+		}
+	}
+}

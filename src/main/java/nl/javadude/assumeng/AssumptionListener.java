@@ -16,12 +16,16 @@
  */
 package nl.javadude.assumeng;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.IInvokedMethod;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.lang.String.format;
 
@@ -42,10 +46,19 @@ public class AssumptionListener extends BaseTestListener {
 	private boolean checkAssumptions(Method method, ITestResult result) {
 		Assumption annotation = method.getAnnotation(Assumption.class);
 		String[] assumptionMethods = annotation.methods();
+		List<String> failedAssumptions = new ArrayList<String>();
 		Class clazz = result.getMethod().getTestClass().getRealClass();
 		boolean assumptionsHold = true;
 		for (String assumptionMethod : assumptionMethods) {
-			assumptionsHold &= checkAssumption(result, clazz, assumptionMethod);
+			boolean assume = checkAssumption(result, clazz, assumptionMethod);
+			if (!assume) {
+				failedAssumptions.add(assumptionMethod);
+			}
+			assumptionsHold &= assume;
+		}
+
+		if (!assumptionsHold) {
+			logger.warn("Skipping [{}] because the {} assumption(s) do not hold.", method.getName(), failedAssumptions);
 		}
 		return assumptionsHold;
 	}
@@ -66,4 +79,5 @@ public class AssumptionListener extends BaseTestListener {
 		}
 	}
 
+	private static final Logger logger = LoggerFactory.getLogger(AssumptionListener.class);
 }

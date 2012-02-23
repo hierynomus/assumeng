@@ -49,7 +49,7 @@ public class AssumptionTest {
 	@Test
 	@Assumption(methods = {"alwaysTrue", "alwaysFalse"})
 	public void shouldAlsoSkip() {
-
+		fail("Should not run");
 	}
 
 	public boolean alwaysFalse() {

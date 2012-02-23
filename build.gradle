@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-  compile 'org.testng:testng:6.4'
+  compile 'org.testng:testng:5.14.10'
   compile 'org.slf4j:slf4j-api:1.6.4'
   testCompile 'org.hamcrest:hamcrest-core:1.2.1'
   testCompile 'org.hamcrest:hamcrest-library:1.2.1'

@@ -33,7 +33,7 @@ public class AssumptionListener extends BaseTestListener {
 	@Override
 	public void beforeInvocation(IInvokedMethod invokedMethod, ITestResult result) {
 		ITestNGMethod testNgMethod = result.getMethod();
-		Method method = testNgMethod.getConstructorOrMethod().getMethod();
+		Method method = testNgMethod.getMethod();
 		if (method == null || !method.isAnnotationPresent(Assumption.class)) {
 			return;
 		}

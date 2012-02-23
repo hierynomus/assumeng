@@ -5,7 +5,8 @@ Using Assume NG it becomes possible to add [JUnit](http://www.junit.org)-like [a
 
 Note
 ----
-Please ensure that Assume NG is on the classpath *before* TestNG. This is because we need to classpath override the TestNG <code>org.testng.internal.Invoker</code> class to hook in our behavior.
+# Please ensure that Assume NG is on the classpath *before* TestNG. This is because we need to classpath override the TestNG <code>org.testng.internal.Invoker</code> class to hook in our behavior.
+# Assume NG currently works with TestNG 5.14.10 (due to the adaptation above).
 
 Usage
 -----

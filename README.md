@@ -22,9 +22,9 @@ The assumption method should have the following signature
 
     public boolean checkWhetherXHolds() { ... }
 
-A full example could be:
+A simple usage example is:
 
-	@Listeners(AssumptionListener.class)
+    @Listeners(AssumptionListener.class)
     public class WeatherTest {
         @Test
         @Assumption(methods = "assumeWeatherIsNice")
@@ -33,6 +33,48 @@ A full example could be:
         }
 
         public boolean assumeWeatherIsNice() {
-        	// check the weather bulletin...
+            // check the weather bulletin...
+        }
+    }
+
+"Real world" use case
+-------------------
+
+    public class HostFactoryItest {
+        @Factory
+        public Object[] createTestInstances() {
+            Object[] instances = new Object[6];
+            object[0] = new HostItest("localhost", "local");
+            object[1] = new HostItest("unix-host", "sftp");
+            object[2] = new HostItest("unix-host", "ssh");
+            object[3] = new HostItest("windows-host", "sftp");
+            object[4] = new HostItest("windows-host", "cifs-telnet");
+            object[5] = new HostItest("windows-host", "cifs-winrm");
+        }
+    }
+
+    public class HostItest() {
+        private String host;
+        private String protocol;
+
+        public HostItest(String host, String protocol) {
+            ...
+        }
+
+        @Test
+        @Assumption(methods = "notLocal")
+        public void shouldNotConnectUsingWrongPassword() {
+            ...
+        }
+
+        @Test
+        public void shouldGetFileFromHost() {
+            ...
+        }
+
+        ...more tests...
+
+        public boolean notLocal() {
+            return !this.host.equals("localhost");
         }
     }

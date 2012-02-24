@@ -53,6 +53,7 @@ A simple usage example is:
         }
     }
 
+    @Listeners(AssumptionListener.class)
     public class HostItest() {
         private String host;
         private String protocol;

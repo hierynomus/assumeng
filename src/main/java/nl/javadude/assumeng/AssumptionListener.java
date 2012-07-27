@@ -26,6 +26,7 @@ import org.testng.IInvokedMethod;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.SkipException;
+import org.testng.internal.ConstructorOrMethod;
 
 import static java.lang.String.format;
 
@@ -33,14 +34,15 @@ public class AssumptionListener extends BaseTestListener {
     @Override
     public void beforeInvocation(IInvokedMethod invokedMethod, ITestResult result) {
         ITestNGMethod testNgMethod = result.getMethod();
-        Method method = testNgMethod.getMethod();
-        if (method == null || !method.isAnnotationPresent(Assumption.class)) {
+        ConstructorOrMethod contructorOrMethod = testNgMethod.getConstructorOrMethod();
+        Method method = contructorOrMethod.getMethod();
+        if (method == null || !contructorOrMethod.getMethod().isAnnotationPresent(Assumption.class)) {
             return;
         }
 
         List<String> failedAssumptions = checkAssumptions(method, result);
         if (!failedAssumptions.isEmpty()) {
-            throw new SkipException(format("Skipping [%s] because the %s assumption(s) do not hold.", method.getName(), failedAssumptions));
+            throw new SkipException(format("Skipping [%s] because the %s assumption(s) do not hold.", contructorOrMethod.getName(), failedAssumptions));
         }
     }
 

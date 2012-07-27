@@ -20,6 +20,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
+import static nl.javadude.assumeng.Assumes.assumeThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.fail;
@@ -29,9 +30,9 @@ public class AssumptionTest {
 
     @AfterClass
     public void assumptionsShouldBeCorrect() {
-        assertThat(AssumptionChecker.getSkippedTests(), equalTo(2));
+        assertThat(AssumptionChecker.getSkippedTests(), equalTo(3));
         assertThat(AssumptionChecker.getFailedTests(), equalTo(0));
-        assertThat(AssumptionChecker.getSuccessTests(), equalTo(1));
+        assertThat(AssumptionChecker.getSuccessTests(), equalTo(2));
     }
 
     @Test
@@ -50,6 +51,18 @@ public class AssumptionTest {
     @Assumption(methods = {"alwaysTrue", "alwaysFalse"})
     public void shouldAlsoSkip() {
         fail("Should not run");
+    }
+
+    @Test
+    public void shouldUseAssumeThatToSkip() {
+        assumeThat(alwaysTrue(), equalTo(false));
+        fail("Should not reach here...");
+    }
+
+    @Test
+    public void shouldUseAssumeThatAndContinue() {
+        assumeThat(alwaysTrue(), equalTo(true));
+        // Ok!
     }
 
     public boolean alwaysFalse() {

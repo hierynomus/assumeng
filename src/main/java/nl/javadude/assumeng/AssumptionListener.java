@@ -40,7 +40,7 @@ public class AssumptionListener extends BaseTestListener {
 
         List<String> failedAssumptions = checkAssumptions(method, result);
         if (!failedAssumptions.isEmpty()) {
-            throw new SkipException(format("Skipping [{}] because the {} assumption(s) do not hold.", method.getName(), failedAssumptions));
+            throw new SkipException(format("Skipping [%s] because the %s assumption(s) do not hold.", method.getName(), failedAssumptions));
         }
     }
 
@@ -74,6 +74,4 @@ public class AssumptionListener extends BaseTestListener {
             throw new RuntimeException(format("Could not access method [%s] to run assumption", assumptionMethod), e);
         }
     }
-
-    private static final Logger logger = LoggerFactory.getLogger(AssumptionListener.class);
 }

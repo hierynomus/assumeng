@@ -16,68 +16,64 @@
  */
 package nl.javadude.assumeng;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.IInvokedMethod;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
+import org.testng.SkipException;
 
 import static java.lang.String.format;
 
 public class AssumptionListener extends BaseTestListener {
-	@Override
-	public void beforeInvocation(IInvokedMethod invokedMethod, ITestResult result) {
-		ITestNGMethod testNgMethod = result.getMethod();
-		Method method = testNgMethod.getMethod();
-		if (method == null || !method.isAnnotationPresent(Assumption.class)) {
-			return;
-		}
+    @Override
+    public void beforeInvocation(IInvokedMethod invokedMethod, ITestResult result) {
+        ITestNGMethod testNgMethod = result.getMethod();
+        Method method = testNgMethod.getMethod();
+        if (method == null || !method.isAnnotationPresent(Assumption.class)) {
+            return;
+        }
 
-		if (!checkAssumptions(method, result)) {
-			result.setStatus(ITestResult.SKIP);
-		}
-	}
+        List<String> failedAssumptions = checkAssumptions(method, result);
+        if (!failedAssumptions.isEmpty()) {
+            throw new SkipException(format("Skipping [{}] because the {} assumption(s) do not hold.", method.getName(), failedAssumptions));
+        }
+    }
 
-	private boolean checkAssumptions(Method method, ITestResult result) {
-		Assumption annotation = method.getAnnotation(Assumption.class);
-		String[] assumptionMethods = annotation.methods();
-		List<String> failedAssumptions = new ArrayList<String>();
-		Class clazz = result.getMethod().getTestClass().getRealClass();
-		boolean assumptionsHold = true;
-		for (String assumptionMethod : assumptionMethods) {
-			boolean assume = checkAssumption(result, clazz, assumptionMethod);
-			if (!assume) {
-				failedAssumptions.add(assumptionMethod);
-			}
-			assumptionsHold &= assume;
-		}
+    private List<String> checkAssumptions(Method method, ITestResult result) {
+        Assumption annotation = method.getAnnotation(Assumption.class);
+        String[] assumptionMethods = annotation.methods();
+        List<String> failedAssumptions = new ArrayList<String>();
+        Class clazz = result.getMethod().getTestClass().getRealClass();
+        for (String assumptionMethod : assumptionMethods) {
+            boolean assume = checkAssumption(result, clazz, assumptionMethod);
+            if (!assume) {
+                failedAssumptions.add(assumptionMethod);
+            }
+        }
 
-		if (!assumptionsHold) {
-			logger.warn("Skipping [{}] because the {} assumption(s) do not hold.", method.getName(), failedAssumptions);
-		}
-		return assumptionsHold;
-	}
+        return failedAssumptions;
+    }
 
-	private boolean checkAssumption(ITestResult result, Class clazz, String assumptionMethod) {
-		try {
-			Method assumption = clazz.getMethod(assumptionMethod);
-			if (assumption.getReturnType() != boolean.class) {
-				throw new RuntimeException(format("Assumption method [%s] should return a boolean", assumptionMethod));
-			}
-			return (Boolean) assumption.invoke(result.getInstance());
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException(format("Could not find method [%s] to run assumption", assumptionMethod), e);
-		} catch (InvocationTargetException e) {
-			throw new RuntimeException(format("Could not invoke method [%s] to run assumption", assumptionMethod), e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(format("Could not access method [%s] to run assumption", assumptionMethod), e);
-		}
-	}
+    private boolean checkAssumption(ITestResult result, Class clazz, String assumptionMethod) {
+        try {
+            Method assumption = clazz.getMethod(assumptionMethod);
+            if (assumption.getReturnType() != boolean.class) {
+                throw new RuntimeException(format("Assumption method [%s] should return a boolean", assumptionMethod));
+            }
+            return (Boolean) assumption.invoke(result.getInstance());
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(format("Could not find method [%s] to run assumption", assumptionMethod), e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(format("Could not invoke method [%s] to run assumption", assumptionMethod), e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(format("Could not access method [%s] to run assumption", assumptionMethod), e);
+        }
+    }
 
-	private static final Logger logger = LoggerFactory.getLogger(AssumptionListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(AssumptionListener.class);
 }

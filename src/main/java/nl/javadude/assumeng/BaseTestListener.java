@@ -16,14 +16,16 @@
  */
 package nl.javadude.assumeng;
 
-import org.testng.*;
+import org.testng.IInvokedMethod;
+import org.testng.IInvokedMethodListener;
+import org.testng.ITestResult;
 
 abstract class BaseTestListener implements IInvokedMethodListener {
-	@Override
-	public void beforeInvocation(IInvokedMethod method, ITestResult testResult) {
-	}
+    @Override
+    public void beforeInvocation(IInvokedMethod method, ITestResult testResult) {
+    }
 
-	@Override
-	public void afterInvocation(IInvokedMethod method, ITestResult testResult) {
-	}
+    @Override
+    public void afterInvocation(IInvokedMethod method, ITestResult testResult) {
+    }
 }

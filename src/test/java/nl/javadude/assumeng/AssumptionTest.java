@@ -25,14 +25,24 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.fail;
 
+class InverseLogic {
+    public static boolean alwaysFalse() {
+        return true;
+    }
+
+    public static boolean alwaysTrue() {
+        return false;
+    }
+}
+
 @Listeners(value = {AssumptionListener.class, AssumptionChecker.class})
 public class AssumptionTest {
 
     @AfterClass
     public void assumptionsShouldBeCorrect() {
-        assertThat(AssumptionChecker.getSkippedTests(), equalTo(3));
+        assertThat(AssumptionChecker.getSkippedTests(), equalTo(4));
         assertThat(AssumptionChecker.getFailedTests(), equalTo(0));
-        assertThat(AssumptionChecker.getSuccessTests(), equalTo(2));
+        assertThat(AssumptionChecker.getSuccessTests(), equalTo(3));
     }
 
     @Test
@@ -51,6 +61,18 @@ public class AssumptionTest {
     @Assumption(methods = {"alwaysTrue", "alwaysFalse"})
     public void shouldAlsoSkip() {
         fail("Should not run");
+    }
+
+    @Test
+    @Assumption(methods = "alwaysTrue", methodClass = InverseLogic.class)
+    public void shouldSkipInverse() {
+        fail("Should not run");
+    }
+
+    @Test
+    @Assumption(methods = "alwaysFalse", methodClass = InverseLogic.class)
+    public void shouldSucceedInverse() {
+        assertThat(InverseLogic.alwaysFalse(), equalTo(true));
     }
 
     @Test

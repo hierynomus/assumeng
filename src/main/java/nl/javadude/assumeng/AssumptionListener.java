@@ -20,8 +20,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testng.IInvokedMethod;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
@@ -50,9 +48,12 @@ public class AssumptionListener extends BaseTestListener {
         Assumption annotation = method.getAnnotation(Assumption.class);
         String[] assumptionMethods = annotation.methods();
         List<String> failedAssumptions = new ArrayList<String>();
-        Class clazz = result.getMethod().getTestClass().getRealClass();
+        Class<?> clazz = annotation.methodClass();
+        boolean isTestClassMethod = clazz == Assumption.TestClass.class;
+        if (isTestClassMethod)
+            clazz = result.getMethod().getTestClass().getRealClass();
         for (String assumptionMethod : assumptionMethods) {
-            boolean assume = checkAssumption(result, clazz, assumptionMethod);
+            boolean assume = checkAssumption(result, clazz, assumptionMethod, isTestClassMethod);
             if (!assume) {
                 failedAssumptions.add(assumptionMethod);
             }
@@ -61,13 +62,13 @@ public class AssumptionListener extends BaseTestListener {
         return failedAssumptions;
     }
 
-    private boolean checkAssumption(ITestResult result, Class clazz, String assumptionMethod) {
+    private boolean checkAssumption(ITestResult result, Class<?> clazz, String assumptionMethod, boolean isLocalMethod) {
         try {
             Method assumption = clazz.getMethod(assumptionMethod);
             if (assumption.getReturnType() != boolean.class) {
                 throw new RuntimeException(format("Assumption method [%s] should return a boolean", assumptionMethod));
             }
-            return (Boolean) assumption.invoke(result.getInstance());
+            return (Boolean) assumption.invoke(isLocalMethod ? result.getInstance() : null);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(format("Could not find method [%s] to run assumption", assumptionMethod), e);
         } catch (InvocationTargetException e) {

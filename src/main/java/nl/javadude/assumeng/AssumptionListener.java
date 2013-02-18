@@ -49,7 +49,7 @@ public class AssumptionListener extends BaseTestListener {
         String[] assumptionMethods = annotation.methods();
         List<String> failedAssumptions = new ArrayList<String>();
         Class<?> clazz = annotation.methodClass();
-        boolean isTestClassMethod = clazz == Assumption.TestClass.class;
+        boolean isTestClassMethod = clazz == Assumption.class;
         if (isTestClassMethod)
             clazz = result.getMethod().getTestClass().getRealClass();
         for (String assumptionMethod : assumptionMethods) {

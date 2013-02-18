@@ -22,8 +22,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Retention(RUNTIME)
 public @interface Assumption {
-    static final class TestClass {};
-
     String[] methods();
-    Class<?> methodClass() default TestClass.class;
+    Class<?> methodClass() default Assumption.class;
 }

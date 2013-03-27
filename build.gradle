@@ -3,7 +3,7 @@ apply plugin: 'idea'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
-version = "1.2.4"
+version = "1.2.5-SNAPSHOT"
 group = "nl.javadude.assumeng"
 
 sourceCompatibility = 1.5
